@@ -1,0 +1,26 @@
+version: 1.0.{build}
+image:
+  Visual Studio 2019
+cache:
+  -  c:\msys64\var\cache\pacman\pkg
+  -  dist
+build_script:
+  - cmd: |
+      set PATH=c:\msys64\usr\bin;%PATH%
+      set MSYSTEM=MSYS
+  - cmd: "
+      bash -x -c \"
+        rm -rf msys2-runtime ;
+        rm -rf src ;
+        mkdir -p src ;
+        git clone --depth 1 --filter=tree:0 --no-checkout -b in-container-posix-semantics https://github.com/YO4/msys2-runtime src/msys2-runtime ;
+        makepkg -d -e -o ;
+        VER=(`makepkg --packagelist`) ;
+        test -e dist/`basename ${VER[0]}` -a -e dist/`basename ${VER[1]}` || (
+          makepkg -s --noconfirm ;
+          rm -f dist/* ;
+          mkdir -p dist;
+          mv `makepkg --packagelist` dist/ 
+        )\"
+      "
+

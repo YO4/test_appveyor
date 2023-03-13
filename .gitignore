@@ -1,0 +1,4 @@
+dist/
+msys2-runtime/
+src/
+pkg/
